@@ -173,3 +173,21 @@ Web configuration Secret name
 {{- define "x509-certificate-exporter.webConfigurationSecretName" -}}
 {{ include "x509-certificate-exporter.fullname" . }}-webconf
 {{- end -}}
+
+{{/*
+Render resources block with null value filtering.
+This template removes any keys with null values from the resources block
+to prevent invalid Kubernetes YAML output.
+*/}}
+{{- define "x509-certificate-exporter.renderResources" -}}
+{{- $resources := . -}}
+{{- if $resources -}}
+resources:
+{{- range $key, $value := $resources }}
+  {{- if ne $value nil }}
+  {{ $key }}:
+    {{- $value | toYaml | trim | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end -}}
+{{- end -}}

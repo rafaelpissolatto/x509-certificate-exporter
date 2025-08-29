@@ -73,10 +73,7 @@ spec:
         securityContext:
           {{- toYaml . | trim | nindent 10 }}
         {{- end }}
-        {{- with .Values.secretsExporter.resources }}
-        resources:
-          {{- . | toYaml | trim | nindent 10 }}
-        {{- end }}
+        {{- include "x509-certificate-exporter.renderResources" .Values.secretsExporter.resources | trim | nindent 8 }}
         image: {{ include "x509-certificate-exporter.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- if or $extraVolumes .Values.webConfiguration .Values.webConfigurationExistingSecret }}
@@ -207,10 +204,7 @@ spec:
         {{- with omit .Values.secretsExporter.livenessProbe "httpGet" }}
           {{ tpl (. | toYaml) $ | indent 10 | trim }}
         {{- end }}
-        {{- with .Values.rbacProxy.resources }}
-        resources:
-        {{- . | toYaml | trim | nindent 10 }}
-        {{- end }}
+        {{- include "x509-certificate-exporter.renderResources" .Values.rbacProxy.resources | trim | nindent 8 }}
       {{- end }}
       {{- if or $extraVolumes .Values.webConfiguration .Values.webConfigurationExistingSecret }}
       volumes:
