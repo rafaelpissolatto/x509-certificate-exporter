@@ -266,6 +266,81 @@ Upgrade release names `x509-certificate-exporter` to the latest version :
 $ helm upgrade x509-certificate-exporter enix/x509-certificate-exporter
 ```
 
+### Customizing Resource Requirements
+
+By default, the chart provides resource limits and requests for all containers. You can customize these resources or completely remove them as needed.
+
+#### Custom resource values
+To override the default resource requirements:
+```yaml
+secretsExporter:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+hostPathsExporter:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+
+rbacProxy:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 20Mi
+    limits:
+      cpu: 50m
+      memory: 40Mi
+```
+
+#### Removing specific resource constraints
+To remove only resource limits while keeping requests (useful for environments where you don't want to impose hard limits):
+```yaml
+secretsExporter:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 30Mi
+    limits: null  # Explicitly remove limits
+
+hostPathsExporter:
+  resources:
+    requests:
+      cpu: 20m
+      memory: 20Mi
+    limits: null  # Explicitly remove limits
+
+rbacProxy:
+  resources:
+    requests:
+      cpu: 5m
+      memory: 10Mi
+    limits: null  # Explicitly remove limits
+```
+
+#### Disabling all resource constraints
+To completely disable resource requirements:
+```yaml
+secretsExporter:
+  resources: null
+
+hostPathsExporter:
+  resources: null
+
+rbacProxy:
+  resources: null
+```
+
+This is particularly useful in development environments or when you want to rely on cluster-wide resource quotas.
+
 ## 📝 Notes
 
 ### `watchFiles` and inode change
@@ -435,6 +510,7 @@ hostPathsExporter:
 | prometheusServiceMonitor.scrapeInterval | string | `"60s"` | Target scrape interval set in the ServiceMonitor |
 | prometheusServiceMonitor.scrapeTimeout | string | `"30s"` | Target scrape timeout set in the ServiceMonitor |
 | prometheusServiceMonitor.extraLabels | object | `{}` | Additional labels to add to ServiceMonitor objects |
+| prometheusServiceMonitor.extraAnnotations | object | `{}` | Additional annotations to add to ServiceMonitor objects |
 | prometheusServiceMonitor.metricRelabelings | list | `[]` | Metric relabel config for the ServiceMonitor, see: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.Endpoint |
 | prometheusServiceMonitor.relabelings | list | `[]` | Relabel config for the ServiceMonitor, see: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.Endpoint |
 | prometheusServiceMonitor.scheme | string | `"http"` | Scheme config for the ServiceMonitor, see: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.Endpoint |

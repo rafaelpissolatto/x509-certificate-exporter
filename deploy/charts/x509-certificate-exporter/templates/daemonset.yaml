@@ -65,9 +65,10 @@ spec:
         securityContext:
           {{- . | toYaml | trim | nindent 10 }}
         {{- end }}
-        {{- with default $.Values.hostPathsExporter.resources $dsDef.resources }}
-        resources:
-          {{- . | toYaml | trim | nindent 10 }}
+        {{- if hasKey $dsDef "resources" }}
+          {{- include "x509-certificate-exporter.renderResources" $dsDef.resources | trim | nindent 8 }}
+        {{- else }}
+          {{- include "x509-certificate-exporter.renderResources" $.Values.hostPathsExporter.resources | trim | nindent 8 }}
         {{- end }}
         image: {{ include "x509-certificate-exporter.image" $ }}
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
@@ -202,10 +203,7 @@ spec:
         {{- with omit $.Values.hostPathsExporter.livenessProbe "httpGet" }}
           {{ tpl (. | toYaml) $ | indent 10 | trim }}
         {{- end }}
-        {{- with $.Values.rbacProxy.resources }}
-        resources:
-        {{- . | toYaml | trim | nindent 10 }}
-        {{- end }}
+        {{- include "x509-certificate-exporter.renderResources" $.Values.rbacProxy.resources | trim | nindent 8 }}
       {{- end }}
       hostNetwork: {{ $.Values.hostNetwork }}
       volumes:
